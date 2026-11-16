@@ -1,0 +1,7 @@
+Index Scan using idx_hackathons_start_date on hackathons h
+  (cost=0.14..4.16 rows=1 width=72) (actual time=0.009..0.009 ms rows=3 loops=1)
+  Index Cond: ((start_date >= CURRENT_DATE) AND
+               (start_date <= (CURRENT_DATE + '30 days'::interval)))
+  Buffers: shared hit=2
+Planning Time: 0.6 ms
+Execution Time: 0.009 ms

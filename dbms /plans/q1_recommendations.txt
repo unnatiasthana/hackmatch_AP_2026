@@ -1,0 +1,8 @@
+Seq Scan on hackathon_skills hs  (cost=0.00..11.00 rows=100 width=8)
+  (actual time=0.012..0.038 ms rows=4 loops=1)
+Hash Join  (cost=8.30..18.90 rows=10 width=72)
+  (actual time=0.098..0.141 ms rows=2 loops=1)
+  Hash Cond: (hs.skill_id = us.skill_id)
+  Buffers: shared hit=4
+Planning Time: 0.9 ms
+Execution Time: 0.141 ms
