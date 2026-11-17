@@ -1,0 +1,38 @@
+{
+  "name": "hackmatch",
+  "version": "0.1.0",
+  "description": "HackMatch: a data-driven recommendation directory that matches students to hackathons by skill overlap.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "ingest": "node src/jobs/ingest.job.js",
+    "test": "node --test \"tests/**/*.test.js\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unnatiasthana/hackmatch.git"
+  },
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/unnatiasthana/hackmatch/issues"
+  },
+  "homepage": "https://github.com/unnatiasthana/hackmatch#readme",
+  "dependencies": {
+    "axios": "^1.20.0",
+    "cheerio": "^1.2.0",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.4",
+    "express": "^5.2.1",
+    "pg": "^8.23.0",
+    "node-cron": "^3.0.3"
+  },
+  "private": true,
+  "engines": {
+    "node": ">=22"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.7"
+  }
+}

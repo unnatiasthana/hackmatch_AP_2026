@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HackMatch</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header><h1>HackMatch</h1><p>Find the hackathon that fits your skills.</p></header>
+<main>
+  <section class="panel">
+    <label for="user">Who are you?</label>
+    <select id="user"></select>
+    <div id="skills" class="chips"></div>
+    <form id="skill-form">
+      <input id="skill-input" placeholder="Add a skill (e.g. react)" autocomplete="off">
+      <button>Add</button>
+    </form>
+  </section>
+  <section>
+    <h2>Recommended for you</h2>
+    <div id="feed" class="grid"></div>
+  </section>
+</main>
+<script src="app.js"></script>
+</body>
+</html>

@@ -61,3 +61,42 @@ Stores the scraped hackathon data.
 
 ## 👨‍💻 Developer
 **Unnati Asthana** - Group Leader / Developer
+
+## ▶️ Running the Project
+
+Prerequisites: Node.js 22+, PostgreSQL 14+.
+
+```bash
+npm install
+cp .env.example .env          # set DATABASE_URL
+createdb hackmatch_db
+psql hackmatch_db -f dbms/03_schema.sql   # schema + sample seed data
+npm run dev                   # API + dashboard on http://localhost:3000
+npm test
+npm run ingest                # run the hackathon ingestion job once
+```
+
+Set `ENABLE_INGEST_CRON=true` to run ingestion on the `INGEST_CRON` schedule inside the API process.
+
+## 🔌 API (all under `/api`)
+
+| Method | Endpoint | Description |
+| --- | --- | --- |
+| GET | `/health` | Service status |
+| GET / POST | `/users` | List users / create `{name, email, college}` |
+| GET | `/users/:id` | Profile with skills (Q2) |
+| POST | `/users/:id/skills` | Add skill `{skill}` (Q3) |
+| DELETE | `/users/:id/skills/:skill` | Remove skill (Q9) |
+| GET | `/users/:id/recommendations` | Ranked hackathon feed (Q1); `?include_past=true` |
+| GET | `/users/leaderboard/colleges` | College leaderboard (Q10) |
+| GET / POST | `/hackathons` | List (`?tag=`) / upsert `{title, link, start_date, tags}` (Q4, Q5) |
+| GET | `/hackathons/upcoming?days=30` | Upcoming events (Q8) |
+| GET | `/hackathons/:id` | One hackathon with tags |
+| GET | `/hackathons/:id/matching-users` | Reverse lookup (Q7) |
+| GET | `/skills`, `/skills/trending` | Skill list / trending skills (Q6) |
+
+## 📁 Structure
+
+`src/` (config, routes, controllers, models, services, jobs, middleware), `public/` (vanilla HTML/CSS/JS dashboard), `dbms/` (BCNF schema, queries, timings), `tests/`.
+
+The API follows the normalized `dbms/` schema (`users`, `colleges`, `skills`, `user_skills`, `hackathons`, `hackathon_skills`) rather than the array columns sketched above. `server.js` and `scraper.js` are the original prototypes, now superseded by `src/`; `scraper.js` targets the older schema and its Devpost logic was ported to `src/services/ingest.service.js`.
