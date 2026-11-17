@@ -2,6 +2,7 @@
 
 **Project:** HackMatch (Data-Driven Hackathon Recommendation Directory)  
 **Role:** Database Normalization Documentation
+**Contributor:** Unnati Asthana  
 **Assignment:** AP CP1  
 **Collaboration Reference:** Coordinated with ER Documentation (`dbms/02_er_diagram.md`), SQL Schema (`dbms/03_schema.sql`), and Queries (`dbms/04_queries.sql`).
 
