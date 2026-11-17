@@ -1,5 +1,7 @@
 # HackMatch ER Diagram
 
+![HackMatch ER diagram](02_er_diagram.png)
+
 ## Entity-Relationship Diagram (BCNF Schema)
 
 ```
