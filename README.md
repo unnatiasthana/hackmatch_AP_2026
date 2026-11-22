@@ -59,8 +59,9 @@ Stores the scraped hackathon data.
 * `start_date` (Date)
 * `tags` (Array of Strings)
 
-## 👨‍💻 Developer
+## 👨‍💻 Developers
 **Unnati Asthana** - Group Leader / Developer
+**Ankit Jakhar** - Developer / Contributor
 
 ## ▶️ Running the Project
 
