@@ -15,3 +15,12 @@ button { padding:8px 16px; border:0; border-radius:12px; background:var(--accent
 .card h3 { margin:0 0 4px; } .card .meta { color:var(--mute); font-size:14px; }
 .card a { color:var(--accent); text-decoration:none; font-weight:600; }
 .empty { color:var(--mute); }
+
+h2 { margin-top: 24px; }
+.panel h2 { margin-top: 0; }
+#message:empty { display: none; }
+#message { color: var(--accent); font-weight: 600; }
+#all-hackathons { margin: 16px 0 24px; }
+.two-boxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0 16px; }
+select, input { max-width: 100%; }
+.card, .chip, .panel { overflow-wrap: anywhere; }
