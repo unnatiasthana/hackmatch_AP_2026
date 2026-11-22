@@ -21,9 +21,22 @@ function uuidParam(name = 'id') {
   };
 }
 
-// Skills are stored lowercase + trimmed (matches schema convention).
+// Other ways people write the same skill
+const otherNames = new Map([
+  ['genai', 'gen ai'],
+  ['gen-ai', 'gen ai'],
+  ['nodejs', 'node.js'],
+  ['node js', 'node.js'],
+  ['reactjs', 'react'],
+  ['react.js', 'react'],
+  ['postgres', 'postgresql'],
+]);
+
+// ' GenAI ' becomes 'gen ai'
 function normalizeSkill(raw) {
-  return typeof raw === 'string' ? raw.trim().toLowerCase() : '';
+  if (typeof raw !== 'string') return '';
+  const skill = raw.trim().toLowerCase().replace(/\s+/g, ' ');
+  return otherNames.get(skill) || skill;
 }
 
 function normalizeSkills(list) {
