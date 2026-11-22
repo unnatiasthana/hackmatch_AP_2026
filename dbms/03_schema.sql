@@ -29,7 +29,7 @@ CREATE TABLE user_skills (
     PRIMARY KEY (user_id, skill_id)
 );
 
--- hackathons: scraped hackathon data
+-- hackathons: imported hackathon data
 CREATE TABLE hackathons (
     id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     title      TEXT NOT NULL,

@@ -51,7 +51,7 @@ SELECT $2, id FROM skills WHERE name = lower(trim($1))
 ON CONFLICT DO NOTHING;
 
 -- -------------------------------------------------------------
--- Q4. Ingest a scraped hackathon (upsert on link)
+-- Q4. Import a hackathon (upsert on link)
 -- -------------------------------------------------------------
 INSERT INTO hackathons (title, link, start_date)
 VALUES ($1, $2, $3)
