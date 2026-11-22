@@ -50,6 +50,8 @@ async function upsert({ title, link, start_date, tags = [] }) {
       [title, link, start_date || null]
     );
     const id = h.rows[0].id;
+    // remove old tags, the loop below adds the new ones
+    await client.query('DELETE FROM hackathon_skills WHERE hackathon_id = $1', [id]);
     for (const tag of tags) {
       await client.query(`INSERT INTO skills (name) VALUES ($1) ON CONFLICT (name) DO NOTHING`, [tag]);
       await client.query(

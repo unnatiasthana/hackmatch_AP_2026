@@ -39,7 +39,7 @@ async function createHackathon(req, res, next) {
 
 async function upcoming(req, res, next) {
   try {
-    const days = Number.parseInt(req.query.days ?? '30', 10);
+    const days = Number(req.query.days ?? 30);
     if (!Number.isInteger(days) || days < 1 || days > 365) {
       throw new HttpError(400, 'days must be an integer between 1 and 365');
     }
