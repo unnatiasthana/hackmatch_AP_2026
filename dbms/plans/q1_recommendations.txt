@@ -1,8 +1,79 @@
-Seq Scan on hackathon_skills hs  (cost=0.00..11.00 rows=100 width=8)
-  (actual time=0.012..0.038 ms rows=4 loops=1)
-Hash Join  (cost=8.30..18.90 rows=10 width=72)
-  (actual time=0.098..0.141 ms rows=2 loops=1)
-  Hash Cond: (hs.skill_id = us.skill_id)
-  Buffers: shared hit=4
-Planning Time: 0.9 ms
-Execution Time: 0.141 ms
+PostgreSQL 18.4, 50,000 generated hackathons (dbms/benchmark.sql).
+Each plan is the middle one of 5 runs.
+
+=== Q1 with indexes
+
+QUERY PLAN
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=199.75..200.37 rows=248 width=70) (actual time=0.736..0.742 rows=261.00 loops=1)
+   Sort Key: (count(*)) DESC, h.start_date
+   Sort Method: quicksort  Memory: 47kB
+   Buffers: shared hit=2305
+   ->  HashAggregate  (cost=187.41..189.89 rows=248 width=70) (actual time=0.673..0.687 rows=261.00 loops=1)
+         Group Key: h.id
+         Batches: 1  Memory Usage: 72kB
+         Buffers: shared hit=2305
+         ->  Nested Loop  (cost=35.96..186.17 rows=248 width=62) (actual time=0.163..0.644 rows=261.00 loops=1)
+               Buffers: shared hit=2305
+               ->  Merge Join  (cost=35.67..60.57 rows=375 width=16) (actual time=0.156..0.225 rows=400.00 loops=1)
+                     Merge Cond: (hs.skill_id = us.skill_id)
+                     Buffers: shared hit=1105
+                     ->  Index Scan using idx_hackathon_skills_skill_id on hackathon_skills hs  (cost=0.29..6788.90 rows=149925 width=20) (actual time=0.002..0.181 rows=1101.00 loops=1)
+                           Index Searches: 1
+                           Buffers: shared hit=1104
+                     ->  Sort  (cost=1.12..1.13 rows=5 width=4) (actual time=0.005..0.005 rows=5.00 loops=1)
+                           Sort Key: us.skill_id
+                           Sort Method: quicksort  Memory: 25kB
+                           Buffers: shared hit=1
+                           ->  Seq Scan on user_skills us  (cost=0.00..1.06 rows=5 width=4) (actual time=0.002..0.003 rows=5.00 loops=1)
+                                 Filter: (user_id = '8beebf31-4f56-4d9b-ba19-562e60af7b08'::uuid)
+                                 Buffers: shared hit=1
+               ->  Index Scan using hackathons_pkey on hackathons h  (cost=0.29..0.33 rows=1 width=62) (actual time=0.001..0.001 rows=0.65 loops=400)
+                     Index Cond: (id = hs.hackathon_id)
+                     Filter: ((start_date IS NULL) OR (start_date >= CURRENT_DATE))
+                     Rows Removed by Filter: 0
+                     Index Searches: 400
+                     Buffers: shared hit=1200
+ Planning:
+   Buffers: shared hit=158
+ Planning Time: 0.365 ms
+ Execution Time: 0.761 ms
+
+=== Q1 without indexes
+
+QUERY PLAN
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=2999.32..2999.93 rows=246 width=70) (actual time=7.818..7.823 rows=261.00 loops=1)
+   Sort Key: (count(*)) DESC, h.start_date
+   Sort Method: quicksort  Memory: 47kB
+   Buffers: shared hit=2156
+   ->  GroupAggregate  (cost=2985.24..2989.55 rows=246 width=70) (actual time=7.734..7.770 rows=261.00 loops=1)
+         Group Key: h.id
+         Buffers: shared hit=2156
+         ->  Sort  (cost=2985.24..2985.86 rows=246 width=62) (actual time=7.732..7.738 rows=261.00 loops=1)
+               Sort Key: h.id
+               Sort Method: quicksort  Memory: 45kB
+               Buffers: shared hit=2156
+               ->  Nested Loop  (cost=1.42..2975.47 rows=246 width=62) (actual time=0.108..7.709 rows=261.00 loops=1)
+                     Buffers: shared hit=2156
+                     ->  Hash Join  (cost=1.12..2849.76 rows=375 width=16) (actual time=0.005..7.248 rows=400.00 loops=1)
+                           Hash Cond: (hs.skill_id = us.skill_id)
+                           Buffers: shared hit=956
+                           ->  Seq Scan on hackathon_skills hs  (cost=0.00..2454.25 rows=149925 width=20) (actual time=0.002..3.654 rows=149925.00 loops=1)
+                                 Buffers: shared hit=955
+                           ->  Hash  (cost=1.06..1.06 rows=5 width=4) (actual time=0.003..0.003 rows=5.00 loops=1)
+                                 Buckets: 1024  Batches: 1  Memory Usage: 9kB
+                                 Buffers: shared hit=1
+                                 ->  Seq Scan on user_skills us  (cost=0.00..1.06 rows=5 width=4) (actual time=0.002..0.002 rows=5.00 loops=1)
+                                       Filter: (user_id = '99d5c059-d0e7-43a5-b49b-bf0f1046c42b'::uuid)
+                                       Buffers: shared hit=1
+                     ->  Index Scan using hackathons_pkey on hackathons h  (cost=0.29..0.34 rows=1 width=62) (actual time=0.001..0.001 rows=0.65 loops=400)
+                           Index Cond: (id = hs.hackathon_id)
+                           Filter: ((start_date IS NULL) OR (start_date >= CURRENT_DATE))
+                           Rows Removed by Filter: 0
+                           Index Searches: 400
+                           Buffers: shared hit=1200
+ Planning:
+   Buffers: shared hit=73
+ Planning Time: 0.208 ms
+ Execution Time: 7.837 ms

@@ -1,7 +1,86 @@
-Index Scan using idx_hackathons_start_date on hackathons h
-  (cost=0.14..4.16 rows=1 width=72) (actual time=0.009..0.009 ms rows=3 loops=1)
-  Index Cond: ((start_date >= CURRENT_DATE) AND
-               (start_date <= (CURRENT_DATE + '30 days'::interval)))
-  Buffers: shared hit=2
-Planning Time: 0.6 ms
-Execution Time: 0.009 ms
+PostgreSQL 18.4, 50,000 generated hackathons (dbms/benchmark.sql).
+Each plan is the middle one of 5 runs.
+
+=== Q8 with indexes
+
+QUERY PLAN
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=3640.04..3641.33 rows=516 width=94) (actual time=8.675..8.690 rows=527.00 loops=1)
+   Sort Key: h.start_date
+   Sort Method: quicksort  Memory: 110kB
+   Buffers: shared hit=993
+   ->  GroupAggregate  (cost=3598.74..3616.79 rows=516 width=94) (actual time=8.399..8.594 rows=527.00 loops=1)
+         Group Key: h.id
+         Buffers: shared hit=993
+         ->  Sort  (cost=3598.74..3602.60 rows=1547 width=78) (actual time=8.393..8.425 rows=1556.00 loops=1)
+               Sort Key: h.id, s.name
+               Sort Method: quicksort  Memory: 199kB
+               Buffers: shared hit=993
+               ->  Hash Left Join  (cost=664.87..3516.78 rows=1547 width=78) (actual time=0.312..8.155 rows=1556.00 loops=1)
+                     Hash Cond: (hs.skill_id = s.id)
+                     Buffers: shared hit=993
+                     ->  Hash Right Join  (cost=606.87..3454.71 rows=1547 width=66) (actual time=0.142..7.859 rows=1556.00 loops=1)
+                           Hash Cond: (hs.hackathon_id = h.id)
+                           Buffers: shared hit=980
+                           ->  Seq Scan on hackathon_skills hs  (cost=0.00..2454.25 rows=149925 width=20) (actual time=0.002..3.690 rows=149925.00 loops=1)
+                                 Buffers: shared hit=955
+                           ->  Hash  (cost=600.42..600.42 rows=516 width=62) (actual time=0.070..0.071 rows=527.00 loops=1)
+                                 Buckets: 1024  Batches: 1  Memory Usage: 58kB
+                                 Buffers: shared hit=25
+                                 ->  Bitmap Heap Scan on hackathons h  (cost=9.59..600.42 rows=516 width=62) (actual time=0.019..0.053 rows=527.00 loops=1)
+                                       Recheck Cond: ((start_date >= CURRENT_DATE) AND (start_date <= (CURRENT_DATE + '30 days'::interval)))
+                                       Heap Blocks: exact=23
+                                       Buffers: shared hit=25
+                                       ->  Bitmap Index Scan on idx_hackathons_start_date  (cost=0.00..9.46 rows=516 width=0) (actual time=0.013..0.014 rows=527.00 loops=1)
+                                             Index Cond: ((start_date >= CURRENT_DATE) AND (start_date <= (CURRENT_DATE + '30 days'::interval)))
+                                             Index Searches: 1
+                                             Buffers: shared hit=2
+                     ->  Hash  (cost=33.00..33.00 rows=2000 width=20) (actual time=0.169..0.169 rows=2000.00 loops=1)
+                           Buckets: 2048  Batches: 1  Memory Usage: 122kB
+                           Buffers: shared hit=13
+                           ->  Seq Scan on skills s  (cost=0.00..33.00 rows=2000 width=20) (actual time=0.003..0.084 rows=2000.00 loops=1)
+                                 Buffers: shared hit=13
+ Planning:
+   Buffers: shared hit=44
+ Planning Time: 0.184 ms
+ Execution Time: 8.715 ms
+
+=== Q8 without indexes
+
+QUERY PLAN
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+ Sort  (cost=4733.61..4734.90 rows=516 width=94) (actual time=11.600..11.611 rows=527.00 loops=1)
+   Sort Key: h.start_date
+   Sort Method: quicksort  Memory: 110kB
+   Buffers: shared hit=1537
+   ->  GroupAggregate  (cost=4692.31..4710.37 rows=516 width=94) (actual time=11.383..11.558 rows=527.00 loops=1)
+         Group Key: h.id
+         Buffers: shared hit=1537
+         ->  Sort  (cost=4692.31..4696.18 rows=1547 width=78) (actual time=11.379..11.408 rows=1556.00 loops=1)
+               Sort Key: h.id, s.name
+               Sort Method: quicksort  Memory: 199kB
+               Buffers: shared hit=1537
+               ->  Hash Left Join  (cost=1758.45..4610.36 rows=1547 width=78) (actual time=3.136..11.160 rows=1556.00 loops=1)
+                     Hash Cond: (hs.skill_id = s.id)
+                     Buffers: shared hit=1537
+                     ->  Hash Right Join  (cost=1700.45..4548.29 rows=1547 width=66) (actual time=2.978..10.877 rows=1556.00 loops=1)
+                           Hash Cond: (hs.hackathon_id = h.id)
+                           Buffers: shared hit=1524
+                           ->  Seq Scan on hackathon_skills hs  (cost=0.00..2454.25 rows=149925 width=20) (actual time=0.005..3.661 rows=149925.00 loops=1)
+                                 Buffers: shared hit=955
+                           ->  Hash  (cost=1694.00..1694.00 rows=516 width=62) (actual time=2.917..2.918 rows=527.00 loops=1)
+                                 Buckets: 1024  Batches: 1  Memory Usage: 58kB
+                                 Buffers: shared hit=569
+                                 ->  Seq Scan on hackathons h  (cost=0.00..1694.00 rows=516 width=62) (actual time=0.051..2.901 rows=527.00 loops=1)
+                                       Filter: ((start_date >= CURRENT_DATE) AND (start_date <= (CURRENT_DATE + '30 days'::interval)))
+                                       Rows Removed by Filter: 49473
+                                       Buffers: shared hit=569
+                     ->  Hash  (cost=33.00..33.00 rows=2000 width=20) (actual time=0.157..0.157 rows=2000.00 loops=1)
+                           Buckets: 2048  Batches: 1  Memory Usage: 122kB
+                           Buffers: shared hit=13
+                           ->  Seq Scan on skills s  (cost=0.00..33.00 rows=2000 width=20) (actual time=0.002..0.072 rows=2000.00 loops=1)
+                                 Buffers: shared hit=13
+ Planning:
+   Buffers: shared hit=29
+ Planning Time: 0.173 ms
+ Execution Time: 11.632 ms
