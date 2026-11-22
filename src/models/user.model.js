@@ -29,14 +29,14 @@ async function create({ name, email, college }) {
 // Q2: full profile with skills
 async function findById(id) {
   const r = await db.query(
-    `SELECT u.id, u.name, u.email, c.name AS college,
+    `SELECT u.id, u.name, c.name AS college,
             COALESCE(ARRAY_AGG(s.name ORDER BY s.name) FILTER (WHERE s.id IS NOT NULL), '{}') AS skills
      FROM users u
      LEFT JOIN colleges c ON c.id = u.college_id
      LEFT JOIN user_skills us ON us.user_id = u.id
      LEFT JOIN skills s ON s.id = us.skill_id
      WHERE u.id = $1
-     GROUP BY u.id, u.name, u.email, c.name`,
+     GROUP BY u.id, u.name, c.name`,
     [id]
   );
   return r.rows[0] || null;
@@ -44,7 +44,7 @@ async function findById(id) {
 
 async function findAll() {
   const r = await db.query(
-    `SELECT u.id, u.name, u.email, c.name AS college
+    `SELECT u.id, u.name, c.name AS college
      FROM users u LEFT JOIN colleges c ON c.id = u.college_id
      ORDER BY u.name`
   );

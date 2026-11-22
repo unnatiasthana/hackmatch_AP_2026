@@ -92,7 +92,7 @@ async function recommendFor(userId, { upcomingOnly = true } = {}) {
 // Q7: reverse lookup for organisers.
 async function matchingUsers(hackathonId) {
   const r = await db.query(
-    `SELECT u.id, u.name, u.email, COUNT(*)::int AS match_score
+    `SELECT u.id, u.name, COUNT(*)::int AS match_score
      FROM hackathon_skills hs
      JOIN user_skills us ON us.skill_id = hs.skill_id
      JOIN users u ON u.id = us.user_id
