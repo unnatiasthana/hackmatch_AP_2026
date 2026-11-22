@@ -58,8 +58,9 @@
 
 See the [ER diagram](dbms/02_er_diagram.md) and [normalization](dbms/01_normalization.md).
 
-## 👨‍💻 Team
+## 👨‍💻 Developers
 * **Unnati Asthana** - Group Leader / Developer
+* **Ankit Jakhar** - Developer / Contributor
 * **RudrakshBairagi**
 * **Ankush Jha**
 
