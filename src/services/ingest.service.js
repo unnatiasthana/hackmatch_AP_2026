@@ -1,38 +1,10 @@
-const axios = require('axios');
-const cheerio = require('cheerio');
 const Hackathon = require('../models/hackathon.model');
 const { normalizeSkills } = require('../middleware/validate');
+const demoHackathons = require('../../data/hackathons.json');
 
-// Source adapters return [{ title, link, start_date, tags }].
-// Real scrapers (Unstop, Devpost) plug in here; they must not crash the job.
-// Adapted from the original scraper.js (Devpost listing page).
-const devpost = {
-  name: 'devpost',
-  async fetch() {
-    const { data } = await axios.get('https://devpost.com/hackathons', { timeout: 15000 });
-    const $ = cheerio.load(data);
-    const items = [];
-    $('.hackathon-tile').each((_, el) => {
-      const title = $(el).find('h3').text().trim();
-      const link = $(el).attr('href') || $(el).find('a').attr('href');
-      // Listing pages only give a date range string, not a parseable date; tags are generic for now.
-      items.push({ title, link, start_date: null, tags: ['javascript', 'web dev', 'gen ai'] });
-    });
-    return items;
-  },
-};
-
-const sources = [
-  {
-    name: 'sample',
-    async fetch() {
-      return [
-        { title: 'AI Sprint', link: 'https://unstop.com/ai-sprint', start_date: '2026-12-05', tags: ['Gen AI', 'Python'] },
-        { title: 'ChainFest', link: 'https://devpost.com/chainfest', start_date: '2026-12-12', tags: ['Web3'] },
-      ];
-    },
-  },
-];
+// Each source returns a list of { title, link, start_date, tags }.
+// For now there is one source: the dummy events in data/hackathons.json.
+const sources = [{ name: 'demo', fetch: async () => demoHackathons }];
 
 function clean(item) {
   if (!item || !item.title || !item.link) return null;
@@ -68,4 +40,4 @@ async function runIngestion(adapters = sources) {
   return summary;
 }
 
-module.exports = { runIngestion, clean, sources, devpost };
+module.exports = { runIngestion, clean, sources };
