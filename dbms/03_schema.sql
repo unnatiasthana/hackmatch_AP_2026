@@ -48,8 +48,7 @@ CREATE TABLE hackathon_skills (
 -- Indexes for fast matching queries
 -- =============================================================
 
--- Speed up skill lookups by name (used by the scraper normaliser)
-CREATE INDEX idx_skills_name ON skills(name);
+-- skills.name needs no index here, UNIQUE already creates one
 
 -- Speed up "which hackathons match this user" join
 CREATE INDEX idx_hackathon_skills_skill_id ON hackathon_skills(skill_id);
