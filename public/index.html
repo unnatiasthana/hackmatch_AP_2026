@@ -1,28 +1,109 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HackMatch</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HackMatch</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<header><h1>HackMatch</h1><p>Find the hackathon that fits your skills.</p></header>
-<main>
-  <section class="panel">
-    <label for="user">Who are you?</label>
-    <select id="user"></select>
-    <div id="skills" class="chips"></div>
-    <form id="skill-form">
-      <input id="skill-input" placeholder="Add a skill (e.g. react)" autocomplete="off">
-      <button>Add</button>
-    </form>
-  </section>
-  <section>
-    <h2>Recommended for you</h2>
-    <div id="feed" class="grid"></div>
-  </section>
-</main>
-<script src="app.js"></script>
+  <header class="top">
+    <div class="width top-row">
+      <div>
+        <h1>HackMatch</h1>
+        <p>Find the hackathon that fits your skills.</p>
+      </div>
+      <nav>
+        <button class="tab" data-page="matches" aria-pressed="true">My matches</button>
+        <button class="tab" data-page="browse" aria-pressed="false">All hackathons</button>
+        <button class="tab" data-page="stats" aria-pressed="false">Trends</button>
+        <button class="tab" data-page="signup" aria-pressed="false">Sign up</button>
+        <button class="tab" data-page="add-event" aria-pressed="false">Add hackathon</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="width">
+    <p id="message" role="status"></p>
+
+    <div class="page" id="matches">
+      <section class="student">
+        <div class="student-info">
+          <label for="user">Student</label>
+          <select id="user"></select>
+          <p id="college-name"></p>
+        </div>
+        <div class="student-skills">
+          <label for="skill-input">Skills</label>
+          <div id="skills" class="chips"></div>
+          <form id="skill-form">
+            <input id="skill-input" list="skill-list" placeholder="Type a skill" autocomplete="off">
+            <datalist id="skill-list"></datalist>
+            <button class="main-button">Add</button>
+          </form>
+        </div>
+      </section>
+
+      <section>
+        <h2>Hackathons for you</h2>
+        <p class="hint">More matching skills means a higher rank.</p>
+        <div id="feed" class="list"></div>
+      </section>
+    </div>
+
+    <div class="page" id="browse" hidden>
+      <div class="title-row">
+        <h2>All hackathons</h2>
+        <label>Skill
+          <select id="filter"><option value="">All skills</option></select>
+        </label>
+      </div>
+      <div id="all-hackathons" class="list"></div>
+    </div>
+
+    <div class="page" id="stats" hidden>
+      <div class="stats-layout">
+        <section>
+          <h2>Most wanted skills</h2>
+          <ul id="trending" class="bars"></ul>
+        </section>
+        <section>
+          <h2>Students by college</h2>
+          <ul id="colleges" class="bars"></ul>
+        </section>
+      </div>
+    </div>
+
+    <div class="page" id="signup" hidden>
+      <form id="signup-form" class="big-form">
+        <h2>Sign up as a student</h2>
+        <label>Name <input id="student-name" required></label>
+        <label>Email <input id="student-email" type="email" required></label>
+        <label>College <input id="student-college"></label>
+        <label>Skills, separated by commas <input id="student-skills" placeholder="python, react"></label>
+        <button class="main-button">Sign up</button>
+      </form>
+    </div>
+
+    <div class="page" id="add-event" hidden>
+      <form id="event-form" class="big-form">
+        <h2>Add a hackathon</h2>
+        <label>Name of event <input id="event-title" required></label>
+        <label>Website link <input id="event-link" type="url" placeholder="https://" required></label>
+        <label>Start date <input id="event-date" type="date" required></label>
+        <label>Skills, separated by commas <input id="event-tags" placeholder="python, gen ai" required></label>
+        <button class="main-button">Add hackathon</button>
+      </form>
+    </div>
+  </main>
+
+  <footer class="width">College project. The sample students and hackathons are dummy data.</footer>
+
+  <script src="tabs.js"></script>
+  <script src="app.js"></script>
+  <script src="explore.js"></script>
+  <script src="signup.js"></script>
+  <script src="event-form.js"></script>
 </body>
 </html>
