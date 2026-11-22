@@ -32,7 +32,7 @@ async function runIngestion(adapters = sources) {
         await Hackathon.upsert(item);
         summary.saved++;
       } catch (e) {
-        console.error(`[ingest] skipped ${item.title}: ${e.message}`);
+        console.error(`[ingest] skipped ${item.title}: ${e.message || e.code}`);
         summary.skipped++;
       }
     }

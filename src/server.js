@@ -16,7 +16,7 @@ app.listen(env.port, (err) => {
 
   db.query('SELECT 1')
     .then(() => console.log('Connected to PostgreSQL database'))
-    .catch((e) => console.warn('Warning: could not connect to PostgreSQL:', e.message));
+    .catch((e) => console.warn('Warning: could not connect to PostgreSQL:', e.message || e.code));
 
   if (env.enableIngestCron) startIngestCron();
 });
