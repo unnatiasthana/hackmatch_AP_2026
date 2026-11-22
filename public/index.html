@@ -19,6 +19,18 @@
       <button>Add</button>
     </form>
   </section>
+  <div class="two-boxes">
+    <details id="signup-box" class="panel">
+      <summary>New student? Sign up</summary>
+      <form id="signup-form" class="big-form">
+        <label>Name <input id="student-name" required></label>
+        <label>Email <input id="student-email" type="email" required></label>
+        <label>College <input id="student-college"></label>
+        <label>Skills, separated by commas <input id="student-skills" placeholder="python, react"></label>
+        <button>Sign up</button>
+      </form>
+    </details>
+  </div>
   <section>
     <h2>Recommended for you</h2>
     <div id="feed" class="grid"></div>
@@ -43,5 +55,6 @@
 </main>
 <script src="app.js"></script>
 <script src="explore.js"></script>
+<script src="signup.js"></script>
 </body>
 </html>

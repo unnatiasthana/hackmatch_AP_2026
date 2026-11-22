@@ -24,3 +24,6 @@ h2 { margin-top: 24px; }
 .two-boxes { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 0 16px; }
 select, input { max-width: 100%; }
 .card, .chip, .panel { overflow-wrap: anywhere; }
+summary { cursor: pointer; font-weight: 600; }
+.big-form label { display: block; margin: 12px 0; }
+.big-form input { display: block; width: 100%; }
