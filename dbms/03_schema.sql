@@ -1,5 +1,7 @@
 -- =============================================================
 -- HackMatch Database Schema (BCNF)
+-- Normalized to BCNF — see dbms/01_normalization.md for the
+-- formal UNF → 1NF → 2NF → 3NF → BCNF decomposition proof.
 -- =============================================================
 
 -- colleges: lookup table so college names are stored once
