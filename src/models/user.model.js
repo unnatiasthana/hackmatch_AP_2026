@@ -1,15 +1,23 @@
 const db = require('../config/db');
 
+async function emailExists(email) {
+  const result = await db.query('SELECT id FROM users WHERE email = $1', [email]);
+  return result.rows.length > 0;
+}
+
+// 'IIT Delhi' and 'iit delhi' are the same college
+async function getCollegeId(name) {
+  const found = await db.query('SELECT id FROM colleges WHERE lower(name) = lower($1)', [name]);
+  if (found.rows.length > 0) return found.rows[0].id;
+
+  const added = await db.query('INSERT INTO colleges (name) VALUES ($1) RETURNING id', [name]);
+  return added.rows[0].id;
+}
+
 async function create({ name, email, college }) {
   let collegeId = null;
   if (college) {
-    const c = await db.query(
-      `INSERT INTO colleges (name) VALUES ($1)
-       ON CONFLICT (name) DO UPDATE SET name = EXCLUDED.name
-       RETURNING id`,
-      [college]
-    );
-    collegeId = c.rows[0].id;
+    collegeId = await getCollegeId(college);
   }
   const r = await db.query(
     `INSERT INTO users (name, email, college_id) VALUES ($1, $2, $3) RETURNING id`,
@@ -74,4 +82,4 @@ async function collegeLeaderboard() {
   return r.rows;
 }
 
-module.exports = { create, findById, findAll, addSkill, removeSkill, collegeLeaderboard };
+module.exports = { create, emailExists, findById, findAll, addSkill, removeSkill, collegeLeaderboard };
