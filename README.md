@@ -24,7 +24,7 @@
 
 ## 🛠️ Tech Stack
 
-* **Frontend:** Vanilla HTML, CSS, JavaScript (Clean, minimal, "Pinterest-style" cards, light and dark theme).
+* **Frontend:** Vanilla HTML, CSS, JavaScript (simple tabs, ranked list of matches).
 * **Backend:** Node.js, Express.js.
 * **Database:** PostgreSQL (using `pg` library).
 
@@ -105,6 +105,7 @@ Set `ENABLE_INGEST_CRON=true` to run the import on the `INGEST_CRON` schedule.
 
 ## 📁 Structure
 
+* `public/tabs.js`: switch between pages
 * `public/app.js`: student, skills and matches
 * `public/explore.js`: all hackathons, filter, trending, colleges
 * `public/signup.js`: signup form

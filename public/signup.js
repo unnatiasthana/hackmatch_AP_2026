@@ -17,7 +17,7 @@ byId('signup-form').addEventListener('submit', async (event) => {
     }
 
     byId('signup-form').reset();
-    byId('signup-box').open = false;
+    showPage('matches');
     await loadUsers(user.id);
     await loadExplore();
     showMessage(`Welcome ${user.name}! Your matches are below.`);

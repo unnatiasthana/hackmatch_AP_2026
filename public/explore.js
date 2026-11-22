@@ -7,7 +7,7 @@ async function showHackathons() {
 
   let html = '';
   for (const hackathon of hackathons) {
-    html += makeCard(hackathon, hackathon.tags, '');
+    html += makeEvent(hackathon, hackathon.tags);
   }
   byId('all-hackathons').innerHTML = html || '<p class="empty">No hackathons for this skill.</p>';
 }
@@ -21,7 +21,23 @@ async function showFilter() {
     html += `<option value="${escapeHtml(skill.name)}">${escapeHtml(skill.name)}</option>`;
   }
   byId('filter').innerHTML = html;
+
+  // the same skills are suggested while typing a skill
+  let suggestions = '';
+  for (const skill of skills) {
+    suggestions += `<option value="${escapeHtml(skill.name)}"></option>`;
+  }
+  byId('skill-list').innerHTML = suggestions;
   byId('filter').value = oldValue;
+}
+
+function makeBar(name, count, biggest) {
+  const safeName = escapeHtml(name);
+  return `
+    <li>
+      <div class="bar-text"><span>${safeName}</span><strong>${count}</strong></div>
+      <progress value="${count}" max="${biggest || 1}" aria-label="${safeName}"></progress>
+    </li>`;
 }
 
 async function showTrending() {
@@ -29,7 +45,8 @@ async function showTrending() {
 
   let html = '';
   for (const skill of skills) {
-    html += `<li>${escapeHtml(skill.name)} (${skill.hackathon_count} events)</li>`;
+    // the list is sorted, so the first one is the biggest
+    html += makeBar(skill.name, skill.hackathon_count, skills[0].hackathon_count);
   }
   byId('trending').innerHTML = html;
 }
@@ -39,7 +56,7 @@ async function showColleges() {
 
   let html = '';
   for (const college of colleges) {
-    html += `<li>${escapeHtml(college.college)} (${college.user_count} students)</li>`;
+    html += makeBar(college.college, college.user_count, colleges[0].user_count);
   }
   byId('colleges').innerHTML = html;
 }

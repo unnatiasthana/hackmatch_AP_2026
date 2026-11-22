@@ -38,19 +38,40 @@ function splitByComma(text) {
   return list;
 }
 
-function makeCard(hackathon, skills, note) {
+// "2026-12-05" becomes a small block with 5, Dec and 2026
+function makeDate(date) {
+  if (!date) return '<div class="date">Date not decided</div>';
+
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const [year, month, day] = date.split('-');
+  return `<div class="date"><strong>${Number(day)}</strong>${months[month - 1]} ${year}</div>`;
+}
+
+// score and isBest are only used on the "My matches" page
+function makeEvent(hackathon, skills, score, isBest) {
   let chips = '';
   for (const skill of skills) {
     chips += `<span class="chip">${escapeHtml(skill)}</span>`;
   }
-  const date = hackathon.start_date || 'Date TBA';
+
+  let side = '';
+  if (isBest) side += '<span class="best-label">Best match</span>';
+  if (score) {
+    const word = score === 1 ? 'skill' : 'skills';
+    side += `<span class="score">${score} matching ${word}</span>`;
+  }
 
   return `
-    <article class="card">
-      <h3>${escapeHtml(hackathon.title)}</h3>
-      <div class="meta">${escapeHtml(date)} ${note}</div>
-      <div class="chips">${chips}</div>
-      <a href="${escapeHtml(hackathon.link)}" target="_blank" rel="noopener">View event →</a>
+    <article class="event ${isBest ? 'best' : ''}">
+      ${makeDate(hackathon.start_date)}
+      <div>
+        <h3>${escapeHtml(hackathon.title)}</h3>
+        <div class="chips">${chips}</div>
+      </div>
+      <div class="event-side">
+        ${side}
+        <a href="${escapeHtml(hackathon.link)}" target="_blank" rel="noopener">View event</a>
+      </div>
     </article>`;
 }
 
@@ -69,7 +90,7 @@ async function loadUsers(selectedId) {
 async function showStudent() {
   const id = byId('user').value;
   if (!id) {
-    byId('feed').innerHTML = '<p class="empty">No students yet.</p>';
+    byId('feed').innerHTML = '<p class="empty">No students yet. Use Sign up to add the first one.</p>';
     return;
   }
 
@@ -83,15 +104,15 @@ async function showStudent() {
     const name = escapeHtml(skill);
     skillsHtml += `<span class="chip">${name}<button data-skill="${name}" aria-label="Remove ${name}">×</button></span>`;
   }
+  byId('college-name').textContent = user.college || '';
   byId('skills').innerHTML = skillsHtml || '<span class="empty">No skills yet.</span>';
 
-  let cardsHtml = '';
-  for (const hackathon of matches) {
-    const word = hackathon.match_score === 1 ? 'skill' : 'skills';
-    const note = `· ${hackathon.match_score} matching ${word}`;
-    cardsHtml += makeCard(hackathon, hackathon.matched_skills, note);
+  let eventsHtml = '';
+  for (let i = 0; i < matches.length; i++) {
+    const hackathon = matches[i];
+    eventsHtml += makeEvent(hackathon, hackathon.matched_skills, hackathon.match_score, i === 0);
   }
-  byId('feed').innerHTML = cardsHtml || '<p class="empty">No matches yet. Add some skills.</p>';
+  byId('feed').innerHTML = eventsHtml || '<p class="empty">No matches yet. Add a skill above.</p>';
 }
 
 byId('user').addEventListener('change', async () => {

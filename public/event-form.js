@@ -13,10 +13,10 @@ byId('event-form').addEventListener('submit', async (event) => {
   try {
     const saved = await callApi('/hackathons', 'POST', hackathon);
     byId('event-form').reset();
-    byId('event-box').open = false;
+    showPage('browse');
     await showStudent();
     await loadExplore();
-    showMessage(`${saved.title} is saved.`);
+    showMessage(`${saved.title} is added.`);
   } catch (error) {
     showMessage(error.message);
   }
