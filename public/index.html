@@ -30,6 +30,16 @@
         <button>Sign up</button>
       </form>
     </details>
+    <details id="event-box" class="panel">
+      <summary>Add a hackathon</summary>
+      <form id="event-form" class="big-form">
+        <label>Name of event <input id="event-title" required></label>
+        <label>Website link <input id="event-link" type="url" placeholder="https://" required></label>
+        <label>Start date <input id="event-date" type="date" required></label>
+        <label>Skills, separated by commas <input id="event-tags" placeholder="python, gen ai" required></label>
+        <button>Save hackathon</button>
+      </form>
+    </details>
   </div>
   <section>
     <h2>Recommended for you</h2>
@@ -56,5 +66,6 @@
 <script src="app.js"></script>
 <script src="explore.js"></script>
 <script src="signup.js"></script>
+<script src="event-form.js"></script>
 </body>
 </html>
