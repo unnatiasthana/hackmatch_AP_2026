@@ -15,7 +15,7 @@
 
 ## 🚀 Overview
 
-**HackMatch** is a data-driven recommendation directory built using Node.js and PostgreSQL. The platform automates data extraction from various hackathon platforms (like Unstop, Devpost) and uses a targeted matching engine to recommend the most relevant events to students based on their specific technical skills and interests.
+**HackMatch** is a data-driven recommendation directory built using Node.js and PostgreSQL. The platform imports hackathons from a JSON file (dummy demo data for now) and uses a targeted matching engine to recommend the most relevant events to students based on their specific technical skills and interests.
 
 ## 💡 The Problem & Solution
 
@@ -32,7 +32,7 @@
 ## 🗺️ Roadmap
 
 ### Phase 1: The Hackathon Discovery Engine (Current Focus)
-1. **Data Ingestion:** A Node.js background cron job scrapes hackathon titles, dates, links, and tags from directories.
+1. **Data Ingestion:** A Node.js job imports hackathon titles, dates, links, and tags from `data/hackathons.json`.
 2. **Storage:** Cleaned data is saved into a PostgreSQL database.
 3. **Matching Logic:** When a user logs in, the backend runs a SQL query comparing the user's saved skills with the hackathon tags, returning a personalized feed of recommended events.
 4. **UI:** A simple dashboard where users select their skills and view matching hackathon cards.
@@ -52,7 +52,7 @@ Stores student profiles and their selected skills.
 * `skills` (Array of Strings)
 
 ### `hackathons` Table
-Stores the scraped hackathon data.
+Stores the imported hackathon data.
 * `id` (Primary Key, UUID)
 * `title` (String)
 * `link` (String, Unique)
@@ -70,10 +70,11 @@ Prerequisites: Node.js 22+, PostgreSQL 14+.
 npm install
 cp .env.example .env          # set DATABASE_URL
 createdb hackmatch_db
-psql hackmatch_db -f dbms/03_schema.sql   # schema + sample seed data
-npm run dev                   # API + dashboard on http://localhost:3000
+psql hackmatch_db -f dbms/03_schema.sql   # tables
+psql hackmatch_db -f dbms/seed.sql        # dummy students
+npm run ingest                # load dummy hackathons
 npm test
-npm run ingest                # run the hackathon ingestion job once
+npm run dev                   # API + dashboard on http://localhost:3000
 ```
 
 Set `ENABLE_INGEST_CRON=true` to run ingestion on the `INGEST_CRON` schedule inside the API process.
@@ -97,6 +98,6 @@ Set `ENABLE_INGEST_CRON=true` to run ingestion on the `INGEST_CRON` schedule ins
 
 ## 📁 Structure
 
-`src/` (config, routes, controllers, models, services, jobs, middleware), `public/` (vanilla HTML/CSS/JS dashboard), `dbms/` (BCNF schema, queries, timings), `tests/`.
+`src/` (config, routes, controllers, models, services, jobs, middleware), `public/` (vanilla HTML/CSS/JS dashboard), `data/` (dummy hackathons), `dbms/` (BCNF schema, seed, queries, timings), `tests/`.
 
-The API follows the normalized `dbms/` schema (`users`, `colleges`, `skills`, `user_skills`, `hackathons`, `hackathon_skills`) rather than the array columns sketched above. `server.js` and `scraper.js` are the original prototypes, now superseded by `src/`; `scraper.js` targets the older schema and its Devpost logic was ported to `src/services/ingest.service.js`.
+The API follows the normalized `dbms/` schema (`users`, `colleges`, `skills`, `user_skills`, `hackathons`, `hackathon_skills`) rather than the array columns sketched above. `server.js` is the original prototype, now superseded by `src/`.
