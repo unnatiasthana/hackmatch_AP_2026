@@ -36,7 +36,7 @@ const sources = [
 
 function clean(item) {
   if (!item || !item.title || !item.link) return null;
-  try { new URL(item.link); } catch { return null; }
+  if (!/^https?:\/\//.test(item.link)) return null;
   return {
     title: String(item.title).trim(),
     link: item.link,
@@ -56,8 +56,13 @@ async function runIngestion(adapters = sources) {
     for (const raw of items) {
       const item = clean(raw);
       if (!item) { summary.skipped++; continue; }
-      await Hackathon.upsert(item);
-      summary.saved++;
+      try {
+        await Hackathon.upsert(item);
+        summary.saved++;
+      } catch (e) {
+        console.error(`[ingest] skipped ${item.title}: ${e.message}`);
+        summary.skipped++;
+      }
     }
   }
   return summary;
