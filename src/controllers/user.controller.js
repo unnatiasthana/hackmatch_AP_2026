@@ -16,6 +16,10 @@ async function createUser(req, res, next) {
     if (typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
       throw new HttpError(400, 'A valid email is required');
     }
+    // check first, so a failed signup does not add a college
+    if (await User.emailExists(email.trim().toLowerCase())) {
+      throw new HttpError(409, 'A user with this email already exists');
+    }
     const user = await User.create({
       name: name.trim(),
       email: email.trim().toLowerCase(),

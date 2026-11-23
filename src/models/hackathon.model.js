@@ -50,6 +50,8 @@ async function upsert({ title, link, start_date, tags = [] }) {
       [title, link, start_date || null]
     );
     const id = h.rows[0].id;
+    // remove old tags, the loop below adds the new ones
+    await client.query('DELETE FROM hackathon_skills WHERE hackathon_id = $1', [id]);
     for (const tag of tags) {
       await client.query(`INSERT INTO skills (name) VALUES ($1) ON CONFLICT (name) DO NOTHING`, [tag]);
       await client.query(
@@ -90,7 +92,7 @@ async function recommendFor(userId, { upcomingOnly = true } = {}) {
 // Q7: reverse lookup for organisers.
 async function matchingUsers(hackathonId) {
   const r = await db.query(
-    `SELECT u.id, u.name, u.email, COUNT(*)::int AS match_score
+    `SELECT u.id, u.name, COUNT(*)::int AS match_score
      FROM hackathon_skills hs
      JOIN user_skills us ON us.skill_id = hs.skill_id
      JOIN users u ON u.id = us.user_id

@@ -16,7 +16,8 @@ SELECT
 FROM user_skills us
 JOIN hackathon_skills hs ON hs.skill_id    = us.skill_id
 JOIN hackathons       h  ON h.id           = hs.hackathon_id
-WHERE us.user_id = $1          -- pass the logged-in user's UUID
+WHERE us.user_id = $1          -- pass the selected student's UUID
+  AND (h.start_date IS NULL OR h.start_date >= CURRENT_DATE)
 GROUP BY h.id
 ORDER BY match_score DESC, h.start_date ASC;
 
@@ -30,7 +31,7 @@ SELECT
     c.name                          AS college,
     ARRAY_AGG(s.name ORDER BY s.name) AS skills
 FROM users u
-JOIN colleges    c  ON c.id = u.college_id
+LEFT JOIN colleges    c  ON c.id = u.college_id
 LEFT JOIN user_skills us ON us.user_id  = u.id
 LEFT JOIN skills      s  ON s.id        = us.skill_id
 WHERE u.id = $1
@@ -50,7 +51,7 @@ SELECT $2, id FROM skills WHERE name = lower(trim($1))
 ON CONFLICT DO NOTHING;
 
 -- -------------------------------------------------------------
--- Q4. Ingest a scraped hackathon (upsert on link)
+-- Q4. Import a hackathon (upsert on link)
 -- -------------------------------------------------------------
 INSERT INTO hackathons (title, link, start_date)
 VALUES ($1, $2, $3)
@@ -102,8 +103,8 @@ ORDER BY match_score DESC;
 -- -------------------------------------------------------------
 SELECT h.*, ARRAY_AGG(s.name ORDER BY s.name) AS tags
 FROM hackathons h
-JOIN hackathon_skills hs ON hs.hackathon_id = h.id
-JOIN skills           s  ON s.id            = hs.skill_id
+LEFT JOIN hackathon_skills hs ON hs.hackathon_id = h.id
+LEFT JOIN skills           s  ON s.id            = hs.skill_id
 WHERE h.start_date BETWEEN CURRENT_DATE AND CURRENT_DATE + INTERVAL '30 days'
 GROUP BY h.id
 ORDER BY h.start_date ASC;

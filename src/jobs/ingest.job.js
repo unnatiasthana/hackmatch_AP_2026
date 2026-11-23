@@ -17,5 +17,13 @@ module.exports = { startIngestCron, runOnce };
 
 // `npm run ingest` runs it once and exits.
 if (require.main === module) {
-  runOnce().then(() => require('../config/db').end()).catch((e) => { console.error(e); process.exit(1); });
+  runOnce()
+    .then((result) => {
+      if (result.saved === 0) process.exitCode = 1;
+      return require('../config/db').end();
+    })
+    .catch((e) => {
+      console.error(e);
+      process.exit(1);
+    });
 }
