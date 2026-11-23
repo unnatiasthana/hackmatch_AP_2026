@@ -2,7 +2,7 @@
 
 **Project:** HackMatch (Data-Driven Hackathon Recommendation Directory)  
 **Role:** Database Normalization Documentation
-**Contributor:** Unnati Asthana  
+**Contributors:** RudrakshBairagi (first draft), Unnati Asthana (formal rewrite)  
 **Assignment:** AP CP1  
 **Collaboration Reference:** Coordinated with ER Documentation (`dbms/02_er_diagram.md`), SQL Schema (`dbms/03_schema.sql`), and Queries (`dbms/04_queries.sql`).
 
@@ -10,7 +10,7 @@
 
 ## 1. Executive Summary & Purpose
 
-HackMatch collects hackathon listings from several platforms and matches students to them by skill overlap. A first, intuitive design stores a student's skills and a hackathon's tags as arrays inside a single row. That design makes matching awkward and invites inconsistent data (for example `IIT Delhi` vs `iit delhi`, or `GenAI` vs `Gen AI`).
+HackMatch stores hackathon listings and matches students to them by skill overlap. A first, intuitive design stores a student's skills and a hackathon's tags as arrays inside a single row. That design makes matching awkward and invites inconsistent data (for example `IIT Delhi` vs `iit delhi`, or `GenAI` vs `Gen AI`).
 
 This document gives a formal normalization analysis for the **HackMatch** database. It tracks the transformation of the unnormalized design (**UNF**) through **First Normal Form (1NF)**, **Second Normal Form (2NF)**, **Third Normal Form (3NF)**, and verifies **Boyce-Codd Normal Form (BCNF)**.
 
@@ -184,7 +184,7 @@ In the HackMatch schema:
 - `user_skills` and `skills`: the shared attribute `skill_id` is the primary key of `skills` — **lossless**.
 - `hackathon_skills` with `hackathons` and `skills`: the shared attributes are the primary keys of `hackathons` and `skills` — **lossless**.
 
-Joining all six relations reproduces the original `USERS_UNF` and `HACKATHONS_UNF` data with no spurious tuples.
+To rebuild `USERS_UNF`, start from `users` and `LEFT JOIN` its college and skills. To rebuild `HACKATHONS_UNF`, start from `hackathons` and `LEFT JOIN` its skills. These are two separate queries. An inner join of all six tables would lose students without skills and hackathons without tags.
 
 ### 7.2 Dependency Preservation
 A decomposition $D = \{R_1, \dots, R_k\}$ preserves $F$ if:
@@ -236,8 +236,9 @@ ORDER BY match_score DESC, h.start_date ASC;
 ## 10. Design Notes
 
 - PostgreSQL could store skills as `TEXT[]` with a GIN index, which would likely be fast enough at our size. We chose junction tables because they keep skills consistent, support foreign keys, and will be needed for Phase 2 (matching teammates with complementary skills).
-- The scraper lowercases and trims tags and maps them to an existing skill row before inserting, otherwise the `skills` table fills up with near-duplicates.
-- `users` and `hackathons` use UUIDs so references don't break if an email or link changes. `email` and `link` stay unique, which also prevents duplicate scrapes.
+- The app lowercases and trims skills and has a short list of other spellings (`genai` is saved as `gen ai`). Spellings outside that list are saved as new skills.
+- `UNIQUE` on `colleges.name` is case-sensitive, so the app compares college names in lowercase before adding one.
+- `users` and `hackathons` use UUIDs so references don't break if an email or link changes. `email` and `link` stay unique, which also prevents duplicate imports.
 
 ---
 

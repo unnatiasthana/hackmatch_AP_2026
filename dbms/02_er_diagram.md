@@ -95,7 +95,7 @@ erDiagram
         int skill_id PK, FK
     }
 
-    colleges ||--o{ users : "has"
+    colleges |o--o{ users : "has"
     users ||--o{ user_skills : "has"
     skills ||--o{ user_skills : "tagged in"
     skills ||--o{ hackathon_skills : "tagged in"

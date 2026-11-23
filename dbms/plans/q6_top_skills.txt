@@ -1,0 +1,60 @@
+PostgreSQL 18.4, 50,000 generated hackathons (dbms/benchmark.sql).
+Each plan is the middle one of 5 runs.
+
+=== Q6 with indexes
+
+QUERY PLAN
+------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=3719.48..3719.51 rows=10 width=28) (actual time=22.512..22.513 rows=10.00 loops=1)
+   Buffers: shared hit=968
+   ->  Sort  (cost=3719.48..3724.48 rows=2000 width=28) (actual time=22.511..22.512 rows=10.00 loops=1)
+         Sort Key: (count(hs.hackathon_id)) DESC
+         Sort Method: top-N heapsort  Memory: 25kB
+         Buffers: shared hit=968
+         ->  HashAggregate  (cost=3656.26..3676.26 rows=2000 width=28) (actual time=22.318..22.411 rows=2000.00 loops=1)
+               Group Key: s.id
+               Batches: 1  Memory Usage: 217kB
+               Buffers: shared hit=968
+               ->  Hash Join  (cost=58.00..2906.64 rows=149925 width=36) (actual time=0.142..13.958 rows=149925.00 loops=1)
+                     Hash Cond: (hs.skill_id = s.id)
+                     Buffers: shared hit=968
+                     ->  Seq Scan on hackathon_skills hs  (cost=0.00..2454.25 rows=149925 width=20) (actual time=0.002..3.759 rows=149925.00 loops=1)
+                           Buffers: shared hit=955
+                     ->  Hash  (cost=33.00..33.00 rows=2000 width=20) (actual time=0.139..0.139 rows=2000.00 loops=1)
+                           Buckets: 2048  Batches: 1  Memory Usage: 122kB
+                           Buffers: shared hit=13
+                           ->  Seq Scan on skills s  (cost=0.00..33.00 rows=2000 width=20) (actual time=0.002..0.067 rows=2000.00 loops=1)
+                                 Buffers: shared hit=13
+ Planning:
+   Buffers: shared hit=42
+ Planning Time: 0.112 ms
+ Execution Time: 22.525 ms
+
+=== Q6 without indexes
+
+QUERY PLAN
+------------------------------------------------------------------------------------------------------------------------------------------------------
+ Limit  (cost=3719.48..3719.51 rows=10 width=28) (actual time=22.755..22.756 rows=10.00 loops=1)
+   Buffers: shared hit=968
+   ->  Sort  (cost=3719.48..3724.48 rows=2000 width=28) (actual time=22.754..22.755 rows=10.00 loops=1)
+         Sort Key: (count(hs.hackathon_id)) DESC
+         Sort Method: top-N heapsort  Memory: 25kB
+         Buffers: shared hit=968
+         ->  HashAggregate  (cost=3656.26..3676.26 rows=2000 width=28) (actual time=22.570..22.658 rows=2000.00 loops=1)
+               Group Key: s.id
+               Batches: 1  Memory Usage: 217kB
+               Buffers: shared hit=968
+               ->  Hash Join  (cost=58.00..2906.64 rows=149925 width=36) (actual time=0.152..14.111 rows=149925.00 loops=1)
+                     Hash Cond: (hs.skill_id = s.id)
+                     Buffers: shared hit=968
+                     ->  Seq Scan on hackathon_skills hs  (cost=0.00..2454.25 rows=149925 width=20) (actual time=0.002..3.731 rows=149925.00 loops=1)
+                           Buffers: shared hit=955
+                     ->  Hash  (cost=33.00..33.00 rows=2000 width=20) (actual time=0.149..0.149 rows=2000.00 loops=1)
+                           Buckets: 2048  Batches: 1  Memory Usage: 122kB
+                           Buffers: shared hit=13
+                           ->  Seq Scan on skills s  (cost=0.00..33.00 rows=2000 width=20) (actual time=0.002..0.072 rows=2000.00 loops=1)
+                                 Buffers: shared hit=13
+ Planning:
+   Buffers: shared hit=12
+ Planning Time: 0.068 ms
+ Execution Time: 22.767 ms
