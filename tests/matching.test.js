@@ -15,7 +15,7 @@ const skillC = `test skill c ${id}`;
 let userId;
 
 before(async () => {
-  const user = await User.create({ name: 'Test Student', email: email, college: null });
+  const user = await User.create({ name: 'Test Student', email: email, college: null, passwordHash: 'x' });
   userId = user.id;
   await User.addSkill(userId, skillA);
   await User.addSkill(userId, skillB);

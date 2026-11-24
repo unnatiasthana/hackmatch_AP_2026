@@ -1,6 +1,8 @@
+const bcrypt = require('bcryptjs');
 const User = require('../models/user.model');
 const Hackathon = require('../models/hackathon.model');
 const { HttpError, normalizeSkill } = require('../middleware/validate');
+const { makeToken } = require('../middleware/auth');
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ok = (res, data, status = 200) => res.status(status).json({ success: true, data });
@@ -11,21 +13,29 @@ async function listUsers(req, res, next) {
 
 async function createUser(req, res, next) {
   try {
-    const { name, email, college } = req.body || {};
+    const { name, email, college, password } = req.body || {};
     if (typeof name !== 'string' || !name.trim()) throw new HttpError(400, 'name is required');
     if (typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
       throw new HttpError(400, 'A valid email is required');
+    }
+    if (typeof password !== 'string' || password.length < 6) {
+      throw new HttpError(400, 'Password must be at least 6 characters');
     }
     // check first, so a failed signup does not add a college
     if (await User.emailExists(email.trim().toLowerCase())) {
       throw new HttpError(409, 'A user with this email already exists');
     }
+    // never save the real password, only its hash (10 = how slow the hashing is)
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // role is not taken from the form, so nobody can sign up as admin
     const user = await User.create({
       name: name.trim(),
       email: email.trim().toLowerCase(),
       college: typeof college === 'string' && college.trim() ? college.trim() : null,
+      passwordHash: passwordHash,
     });
-    ok(res, user, 201);
+    ok(res, { user: user, token: makeToken(user) }, 201);
   } catch (e) {
     if (e.code === '23505') return next(new HttpError(409, 'A user with this email already exists'));
     next(e);

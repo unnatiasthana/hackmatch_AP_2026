@@ -33,6 +33,7 @@
 * **Frontend:** Vanilla HTML, CSS, JavaScript (simple tabs, ranked list of matches).
 * **Backend:** Node.js, Express.js.
 * **Database:** PostgreSQL (using `pg` library).
+* **Login:** bcryptjs (password hashing) and jsonwebtoken (JWT login tokens).
 
 
 ## 🗺️ Roadmap
@@ -42,9 +43,19 @@
 2. **Storage:** The data is saved in PostgreSQL.
 3. **Matching:** A SQL query counts the skills shared by the student and each hackathon, and ranks by that count.
 4. **UI:** Sign up, edit skills, see matches, add a hackathon, filter events, and view trending skills and top colleges.
+5. **Login and roles:** Passwords are saved as bcrypt hashes. Logging in gives a JWT token. A student can change only their own skills, and only the admin can add hackathons.
+
+### Demo logins
+
+| Who | Email | Password |
+| --- | --- | --- |
+| Student | `asha@example.com`, `ravi@example.com`, `priya@example.com` | `demo1234` |
+| Admin | `admin@example.com` | `admin123` |
+
+Anyone can still view students and matches without logging in. These passwords are public demo passwords, so change them before real use.
 
 ### Not built yet
-* **Login:** You pick a student from a list, so anyone using the app can edit any student. Do not host it publicly like this.
+* **Safer logins:** no limit on wrong password tries, no "forgot password", and the token is kept in `localStorage`. A real app would add these.
 * **Live data from other websites:** [Devpost's terms](https://info.devpost.com/legal/devpost/terms-of-service) don't allow scraping, so we import from a file.
 
 ### Phase 2: The Teammate Matchmaker (Future Scope)
@@ -79,13 +90,16 @@ npm install
 cp .env.example .env
 createdb hackmatch_db
 psql hackmatch_db -f dbms/03_schema.sql   # tables
-psql hackmatch_db -f dbms/seed.sql        # dummy students
+psql hackmatch_db -f dbms/seed.sql        # dummy students and admin
 npm run ingest                # load dummy hackathons
 npm test                      # needs the database
 npm run dev                   # API + dashboard on http://localhost:3000
 ```
 
 Run the setup only once. After that, `npm run dev` is enough.
+
+Already made the database before login was added? Run `psql hackmatch_db -f dbms/06_add_login.sql` once.
+On the live site, set `JWT_SECRET` to a long random string.
 
 If it says `password must be a string`, your Postgres wants a password. Either add it to `DATABASE_URL` in `.env`
 (`postgresql://USER:PASSWORD@localhost:5432/hackmatch_db`) or, if plain `psql` works without one, use
@@ -95,16 +109,20 @@ Set `ENABLE_INGEST_CRON=true` to run the import on the `INGEST_CRON` schedule.
 
 ## 🔌 API (all under `/api`)
 
+🔒 = send `Authorization: Bearer <token>`. No token gives 401, a token without permission gives 403.
+
 | Method | Endpoint | Description |
 | --- | --- | --- |
 | GET | `/health` | Service status |
-| GET / POST | `/users` | List users / create `{name, email, college}` |
+| POST | `/auth/login` | Log in `{email, password}`, returns `{token, user}` |
+| GET | `/auth/me` | 🔒 The logged in user |
+| GET / POST | `/users` | List students / sign up `{name, email, password, college}`, returns `{user, token}` |
 | GET | `/users/:id` | Profile with skills, no email (Q2) |
-| POST | `/users/:id/skills` | Add skill `{skill}` (Q3) |
-| DELETE | `/users/:id/skills/:skill` | Remove skill (Q9) |
+| POST | `/users/:id/skills` | 🔒 Add skill `{skill}`, only your own (Q3) |
+| DELETE | `/users/:id/skills/:skill` | 🔒 Remove skill, only your own (Q9) |
 | GET | `/users/:id/recommendations` | Ranked hackathon feed (Q1); `?include_past=true` |
 | GET | `/users/leaderboard/colleges` | College leaderboard (Q10) |
-| GET / POST | `/hackathons` | List (`?tag=`) / upsert `{title, link, start_date, tags}` (Q4, Q5) |
+| GET / POST | `/hackathons` | List (`?tag=`) / 🔒 admin only: upsert `{title, link, start_date, tags}` (Q4, Q5) |
 | GET | `/hackathons/upcoming?days=30` | Upcoming events (Q8) |
 | GET | `/hackathons/:id` | One hackathon with tags |
 | GET | `/hackathons/:id/matching-users` | Reverse lookup (Q7) |
@@ -114,13 +132,15 @@ Set `ENABLE_INGEST_CRON=true` to run the import on the `INGEST_CRON` schedule.
 
 * `public/tabs.js`: switch between pages
 * `public/app.js`: student, skills and matches
+* `public/login.js`: log in, log out, keep the token
 * `public/explore.js`: all hackathons, filter, trending, colleges
 * `public/signup.js`: signup form
 * `public/event-form.js`: add hackathon form
 * `src/routes/`: API addresses
 * `src/controllers/`: check the input and send the response
+* `src/middleware/auth.js`: login check (401) and permission checks (403)
 * `src/models/`: SQL queries
 * `src/services/`, `src/jobs/`: import hackathons
 * `data/`: dummy hackathons
 * `dbms/`: schema, seed, queries, timings
-* `tests/`: API and matching tests
+* `tests/`: API, login and matching tests

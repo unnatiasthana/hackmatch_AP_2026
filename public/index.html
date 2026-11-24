@@ -27,6 +27,18 @@
   </header>
 
   <main class="width">
+    <section class="account">
+      <form id="login-form">
+        <input id="login-email" type="email" placeholder="Email" aria-label="Email" required>
+        <input id="login-password" type="password" placeholder="Password" aria-label="Password" required>
+        <button class="main-button">Log in</button>
+      </form>
+      <p id="logged-in" hidden>
+        Logged in as <strong id="me-name"></strong> <span id="me-role" class="role"></span>
+        <button id="logout" class="small-button">Log out</button>
+      </p>
+    </section>
+
     <p id="message" role="status"></p>
 
     <div class="page" id="matches">
@@ -49,7 +61,7 @@
 
       <section>
         <h2>Hackathons for you</h2>
-        <p class="hint">More matching skills means a higher rank.</p>
+        <p class="hint">More matching skills means a higher rank. Log in as this student to change their skills.</p>
         <div id="feed" class="list"></div>
       </section>
     </div>
@@ -82,6 +94,7 @@
         <h2>Sign up as a student</h2>
         <label>Name <input id="student-name" required></label>
         <label>Email <input id="student-email" type="email" required></label>
+        <label>Password, at least 6 characters <input id="student-password" type="password" minlength="6" required></label>
         <label>College <input id="student-college"></label>
         <label>Skills, separated by commas <input id="student-skills" placeholder="python, react"></label>
         <button class="main-button">Sign up</button>
@@ -91,6 +104,7 @@
     <div class="page" id="add-event" hidden>
       <form id="event-form" class="big-form">
         <h2>Add a hackathon</h2>
+        <p class="hint">Only an admin can add hackathons. Log in with the admin account first.</p>
         <label>Name of event <input id="event-title" required></label>
         <label>Website link <input id="event-link" type="url" placeholder="https://" required></label>
         <label>Start date <input id="event-date" type="date" required></label>
@@ -104,6 +118,7 @@
 
   <script src="tabs.js"></script>
   <script src="app.js"></script>
+  <script src="login.js"></script>
   <script src="explore.js"></script>
   <script src="signup.js"></script>
   <script src="event-form.js"></script>

@@ -21,6 +21,8 @@
                  │ name                      │
                  │ email (UNIQUE)            │
                  │ college_id (FK→colleges)  │
+                 │ password_hash             │
+                 │ role (student / admin)    │
                  └─────────────┬─────────────┘
                                │ 1
                                │
@@ -75,6 +77,8 @@ erDiagram
         text name
         text email
         int college_id FK
+        text password_hash
+        text role
     }
     skills {
         int id PK

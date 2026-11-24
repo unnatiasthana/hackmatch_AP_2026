@@ -154,12 +154,14 @@ A relation $R$ is in **BCNF** if and only if for every non-trivial functional de
 
 ### 6.2 Formal BCNF Verification by Relation
 
+*Login added two columns to `users`: `password_hash` and `role`. Both depend only on the user's key, so `users` stays in BCNF.*
+
 | Relation Name | Determinant ($X$) | Dependent ($Y$) | Is $X$ a Superkey? | Normal Form Evaluation |
 |---|---|---|:---:|---|
 | **`colleges`** | `{id}` | `{name}` | **YES** (PK) | Satisfies BCNF |
 | | `{name}` | `{id}` | **YES** (Unique AK) | Satisfies BCNF |
-| **`users`** | `{id}` | `{name, email, college_id}` | **YES** (PK) | Satisfies BCNF |
-| | `{email}` | `{id, name, college_id}` | **YES** (Unique AK) | Satisfies BCNF |
+| **`users`** | `{id}` | `{name, email, college_id, password_hash, role}` | **YES** (PK) | Satisfies BCNF |
+| | `{email}` | `{id, name, college_id, password_hash, role}` | **YES** (Unique AK) | Satisfies BCNF |
 | **`skills`** | `{id}` | `{name}` | **YES** (PK) | Satisfies BCNF |
 | | `{name}` | `{id}` | **YES** (Unique AK) | Satisfies BCNF |
 | **`user_skills`** | `{user_id, skill_id}` | (all attributes — key only) | **YES** (PK) | Satisfies BCNF |
@@ -212,7 +214,7 @@ Every dependency in HackMatch (`id → attributes`, `email → id`, `link → id
 
 ```sql
 colleges         (id PK, name UNIQUE)
-users            (id PK, name, email UNIQUE, college_id FK -> colleges)
+users            (id PK, name, email UNIQUE, college_id FK -> colleges, password_hash, role)
 skills           (id PK, name UNIQUE)
 user_skills      (user_id FK -> users, skill_id FK -> skills, PK(user_id, skill_id))
 hackathons       (id PK, title, link UNIQUE, start_date)

@@ -14,10 +14,13 @@ INSERT INTO skills (name) VALUES
     ('node.js'),
     ('postgresql');
 
-INSERT INTO users (name, email, college_id) VALUES
-    ('Asha',  'asha@example.com', 1),
-    ('Ravi',  'ravi@example.com', 1),
-    ('Priya', 'priya@example.com', 2);
+-- Demo passwords: students = demo1234, admin = admin123
+-- These are bcrypt hashes. Same password, different hash, because of the salt.
+INSERT INTO users (name, email, college_id, password_hash, role) VALUES
+    ('Asha',  'asha@example.com',  1, '$2b$10$FBPJok/Ur70fAEBWwGwAa.rn5iL7rVnauW2VLZAl5fDx3dx9wRZeq', 'student'),
+    ('Ravi',  'ravi@example.com',  1, '$2b$10$1fgw2utslZ6hCP6.h9DtW.XvvkmWlViUtLe1sqQ1x2abrrg4lNChC', 'student'),
+    ('Priya', 'priya@example.com', 2, '$2b$10$3JxRE41z5HBRsVlkXosDn.2DY3r/NTFEMII29Ypf5ZAvr/V8GY5Su', 'student'),
+    ('Admin', 'admin@example.com', NULL, '$2b$10$gRTazJ/o8V4XYuYjYQhxBeUCgbLdxfvutY6UQP6gWf2J8eRW4dTw.', 'admin');
 
 -- Asha: Gen AI, Python
 INSERT INTO user_skills (user_id, skill_id)

@@ -373,3 +373,51 @@ progress::-moz-progress-bar {
     text-align: left;
   }
 }
+
+/* login bar */
+.account {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+#login-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+#login-form input {
+  width: 200px;
+}
+
+#logged-in {
+  margin: 0;
+}
+
+.role {
+  margin: 0 6px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: var(--yellow);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.small-button {
+  padding: 4px 10px;
+  border: 2px solid var(--navy);
+  border-radius: 6px;
+  background: var(--white);
+  font-size: 15px;
+}
+
+@media (max-width: 600px) {
+  .account {
+    justify-content: flex-start;
+  }
+
+  #login-form input {
+    width: 100%;
+  }
+}

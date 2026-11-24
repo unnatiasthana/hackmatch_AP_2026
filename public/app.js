@@ -9,6 +9,10 @@ async function callApi(path, method = 'GET', body) {
   const options = { method: method, headers: { 'Content-Type': 'application/json' } };
   if (body) options.body = JSON.stringify(body);
 
+  // if we are logged in, send the token so the server knows who we are
+  const token = localStorage.getItem('token');
+  if (token) options.headers.Authorization = 'Bearer ' + token;
+
   const response = await fetch('/api' + path, options);
   const result = await response.json();
   if (!result.success) throw new Error(result.message);

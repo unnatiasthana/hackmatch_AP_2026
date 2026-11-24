@@ -10,12 +10,16 @@ CREATE TABLE colleges (
     name TEXT   UNIQUE NOT NULL
 );
 
--- users: student profiles
+-- users: student profiles (and the admin)
+-- password_hash: bcrypt hash, never the real password
+-- role: 'student' or 'admin', used for authorization
 CREATE TABLE users (
-    id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    name       TEXT NOT NULL,
-    email      TEXT UNIQUE NOT NULL,
-    college_id INT  REFERENCES colleges(id)
+    id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    name          TEXT NOT NULL,
+    email         TEXT UNIQUE NOT NULL,
+    college_id    INT  REFERENCES colleges(id),
+    password_hash TEXT NOT NULL,
+    role          TEXT NOT NULL DEFAULT 'student' CHECK (role IN ('student', 'admin'))
 );
 
 -- skills: canonical skill/tag names (lowercase, trimmed)

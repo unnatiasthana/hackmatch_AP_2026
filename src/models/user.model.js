@@ -14,14 +14,23 @@ async function getCollegeId(name) {
   return added.rows[0].id;
 }
 
-async function create({ name, email, college }) {
+// only login needs the password hash, so only this function reads it
+async function findForLogin(email) {
+  const r = await db.query(
+    'SELECT id, name, role, password_hash FROM users WHERE email = $1',
+    [email]
+  );
+  return r.rows[0] || null;
+}
+
+async function create({ name, email, college, passwordHash }) {
   let collegeId = null;
   if (college) {
     collegeId = await getCollegeId(college);
   }
   const r = await db.query(
-    `INSERT INTO users (name, email, college_id) VALUES ($1, $2, $3) RETURNING id`,
-    [name, email, collegeId]
+    `INSERT INTO users (name, email, college_id, password_hash) VALUES ($1, $2, $3, $4) RETURNING id`,
+    [name, email, collegeId, passwordHash]
   );
   return findById(r.rows[0].id);
 }
@@ -29,14 +38,14 @@ async function create({ name, email, college }) {
 // Q2: full profile with skills
 async function findById(id) {
   const r = await db.query(
-    `SELECT u.id, u.name, c.name AS college,
+    `SELECT u.id, u.name, u.role, c.name AS college,
             COALESCE(ARRAY_AGG(s.name ORDER BY s.name) FILTER (WHERE s.id IS NOT NULL), '{}') AS skills
      FROM users u
      LEFT JOIN colleges c ON c.id = u.college_id
      LEFT JOIN user_skills us ON us.user_id = u.id
      LEFT JOIN skills s ON s.id = us.skill_id
      WHERE u.id = $1
-     GROUP BY u.id, u.name, c.name`,
+     GROUP BY u.id, u.name, u.role, c.name`,
     [id]
   );
   return r.rows[0] || null;
@@ -46,6 +55,7 @@ async function findAll() {
   const r = await db.query(
     `SELECT u.id, u.name, c.name AS college
      FROM users u LEFT JOIN colleges c ON c.id = u.college_id
+     WHERE u.role = 'student'
      ORDER BY u.name`
   );
   return r.rows;
@@ -82,4 +92,4 @@ async function collegeLeaderboard() {
   return r.rows;
 }
 
-module.exports = { create, emailExists, findById, findAll, addSkill, removeSkill, collegeLeaderboard };
+module.exports = { create, findForLogin, emailExists, findById, findAll, addSkill, removeSkill, collegeLeaderboard };
