@@ -13,6 +13,12 @@
   <img src="https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white" alt="CSS3" />
 </p>
 
+<p align="center">
+  <strong>Live demo:</strong> <a href="https://hackmatch-ten.vercel.app">hackmatch-ten.vercel.app</a>
+  <br />
+  <sub>Hosted on Vercel with a free Neon PostgreSQL database. It uses dummy data and has no login.</sub>
+</p>
+
 ## 🚀 Overview
 
 **HackMatch** is a data-driven recommendation directory built using Node.js and PostgreSQL. The platform imports hackathons from a JSON file (dummy demo data for now) and uses a targeted matching engine to recommend the most relevant events to students based on their specific technical skills and interests.
